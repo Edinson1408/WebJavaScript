@@ -6549,9 +6549,10 @@ body {
   padding: 10px 0;
   text-align: center; }
 
-.signup-box .platzigram {
+.platzigram {
   font-family: "Oleo Script";
-  font-size: 42px; }
+  font-size: 42px;
+  color: #125688; }
 
 .signup-form {
   width: 65%;
@@ -6566,7 +6567,14 @@ body {
   font-size: .9em; }
 
 .signup-form .btn.btn-fb:hover, .signup-form .btn-fb.btn-large:hover, .signup-form .btn-fb.btn-small:hover {
-  background-color: #2d6599; }
+  background-color: #125688; }
 
 .signup-form .btn.btn-signup, .signup-form .btn-signup.btn-large, .signup-form .btn-signup.btn-small {
   background-color: #125688; }
+
+.header,
+.signup-box {
+  background-color: white;
+  color: #125688;
+  box-shadow: none;
+  border-bottom: 1px solid #edeeee; }

@@ -2727,6 +2727,177 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],13:[function(require,module,exports){
+// Utilities
+const lowerCase = require('./lower-case')
+const specials = require('./specials')
+
+const regex = /(?:(?:(\s?(?:^|[.\(\)!?;:"-])\s*)(\w))|(\w))(\w*[’']*\w*)/g
+
+const convertToRegExp = specials => specials.map(s => [new RegExp(`\\b${s}\\b`, 'gi'), s])
+
+function parseMatch(match) {
+  const firstCharacter = match[0]
+
+  // test first character
+  if (/\s/.test(firstCharacter)) {
+    // if whitespace - trim and return
+    return match.substr(1)
+  }
+  if (/[\(\)]/.test(firstCharacter)) {
+    // if parens - this shouldn't be replaced
+    return null
+  }
+
+  return match
+}
+
+module.exports = (str, options = {}) => {
+  str = str.toLowerCase().replace(regex, (m, lead = '', forced, lower, rest) => {
+    const parsedMatch = parseMatch(m)
+    if (!parsedMatch) {
+      return m
+    }
+    if (!forced) {
+      const fullLower = lower + rest
+
+      if (lowerCase.has(fullLower)) {
+        return parsedMatch
+      }
+    }
+
+    return lead + (lower || forced).toUpperCase() + rest
+  })
+
+  const customSpecials = options.special || []
+  const replace = [...specials, ...customSpecials]
+  const replaceRegExp = convertToRegExp(replace)
+
+  replaceRegExp.forEach(([pattern, s]) => {
+    str = str.replace(pattern, s)
+  })
+
+  return str
+}
+
+},{"./lower-case":14,"./specials":15}],14:[function(require,module,exports){
+const conjunctions = [
+  'for',
+  'and',
+  'nor',
+  'but',
+  'or',
+  'yet',
+  'so'
+]
+
+const articles = [
+  'a',
+  'an',
+  'the'
+]
+
+const prepositions = [
+  'aboard',
+  'about',
+  'above',
+  'across',
+  'after',
+  'against',
+  'along',
+  'amid',
+  'among',
+  'anti',
+  'around',
+  'as',
+  'at',
+  'before',
+  'behind',
+  'below',
+  'beneath',
+  'beside',
+  'besides',
+  'between',
+  'beyond',
+  'but',
+  'by',
+  'concerning',
+  'considering',
+  'despite',
+  'down',
+  'during',
+  'except',
+  'excepting',
+  'excluding',
+  'following',
+  'for',
+  'from',
+  'in',
+  'inside',
+  'into',
+  'like',
+  'minus',
+  'near',
+  'of',
+  'off',
+  'on',
+  'onto',
+  'opposite',
+  'over',
+  'past',
+  'per',
+  'plus',
+  'regarding',
+  'round',
+  'save',
+  'since',
+  'than',
+  'through',
+  'to',
+  'toward',
+  'towards',
+  'under',
+  'underneath',
+  'unlike',
+  'until',
+  'up',
+  'upon',
+  'versus',
+  'via',
+  'with',
+  'within',
+  'without'
+]
+
+module.exports = new Set([
+  ...conjunctions,
+  ...articles,
+  ...prepositions
+])
+
+},{}],15:[function(require,module,exports){
+const intended = [
+  'ZEIT',
+  'ZEIT Inc.',
+  'CLI',
+  'API',
+  'Next.js',
+  'Node.js',
+  'HTTP',
+  'HTTPS',
+  'JSX',
+  'DNS',
+  'URL',
+  'now.sh',
+  'now.json',
+  'CI',
+  'CDN',
+  'package.json',
+  'GitHub'
+]
+
+module.exports = intended
+
+},{}],16:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
 var morphdom = require('morphdom') // efficiently diffs + morphs two DOM elements
 var defaultEvents = require('./update-events.js') // default events to be copied when dom elements update
@@ -2770,7 +2941,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":14,"bel":1,"morphdom":8}],14:[function(require,module,exports){
+},{"./update-events.js":17,"bel":1,"morphdom":8}],17:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -2808,44 +2979,141 @@ module.exports = [
   'onfocusout'
 ]
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var page  = require('page');
-
-
-
+var empty = require('empty-element');
+var template= require('./template');
+var title = require('title');
 
 page('/',function(ctx,next){
+title('AppGol - Signin');
 var main = document.getElementById('main-container');
-main.innerHTML ='<a href="/signup">Entrar</a>';
-
+//main.innerHTML ='<a href="/signup">Entrar</a>';
+empty(main).appendChild(template);
 });
-},{"page":11}],16:[function(require,module,exports){
+
+
+},{"./template":19,"empty-element":3,"page":11,"title":13}],19:[function(require,module,exports){
+var yo = require('yo-yo');
+
+var template =yo`
+<nav class="header">
+	<div class="nav-wrapper">
+		<div class="container">
+			<div class="row">
+				<div class="col s10 m6 offset-m1">
+					<a href="/" class="bramd-logo platzigram">App Gol</a>
+				</div>
+				<div class="col s2 m5 push-m4">
+					<a class="btn btn-large btn-flat dropdown-button" data-target='drop-user'>
+					<i class="fas fa-user" aria-hidden="true"></i></a>
+					<ul id="drop-user" class="dropdown-content">
+						<li><a href="#">Salir</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</nav>`;
+
+module.exports=template;
+},{"yo-yo":16}],20:[function(require,module,exports){
 var page  = require('page');
 
 
 require('./homepage');
 require('./signup');
+require('./signin');
 
 
 
 
 page();
-},{"./homepage":15,"./signup":17,"page":11}],17:[function(require,module,exports){
+},{"./homepage":18,"./signin":22,"./signup":24,"page":11}],21:[function(require,module,exports){
+var yo= require('yo-yo');
+
+module.exports=function landing(box){
+
+return yo`<div class="container">
+		<div class="row">
+			<div class="col s10 push-s1">
+				<div class="row">
+					<div class="col m5 hide-on-small-only">
+						<img class="iphone" src="iphone.png" alt="">
+					</div>
+						${box}
+				</div>
+			</div>
+		</div>
+	</div>
+	`;
+
+
+}
+
+
+},{"yo-yo":16}],22:[function(require,module,exports){
 var page  = require('page');
 var empty = require('empty-element');
 var template= require('./template');
-
-page('/signup',function(ctx,next){
+var title = require('title');
+page('/signin',function(ctx,next){
+	title('AppGol - Signin');
 	var main = document.getElementById('main-container');
 	empty(main).appendChild(template);
 //main.innerHTML='signup<a href="/">home</a>';
 
 })
 
-},{"./template":18,"empty-element":3,"page":11}],18:[function(require,module,exports){
+},{"./template":23,"empty-element":3,"page":11,"title":13}],23:[function(require,module,exports){
 var yo 	  = require('yo-yo');
+var landing =require('../landing');
+var signinForm=yo`<div class="col s12 m7">
+						<div class="signup-box">
+							<div class="row">
+								<h1 class="platzigram">App Gol</h1>
+								<form action="" class="signup-form">
+									
+									<div class="section">
+										<a class="btn btn-fb hide-on-small-only">Iniciar session con facebook</a>
+										<a class="btn btn-fb hide-on-med-and-up">
+										<i class="fab fa-facebook-square"></i>
+										Iniciar session</a>
+									</div>
+									<div class="divider"></div>
+									<div class="section">
+										<input type="text" name="username" placeholder="Nombre de Usuario">
+										<input type="password" name="password" placeholder="Contraseña">
+										<button class="btn waves-effect waves-light btn-signup" type="submit">Inicia Session</button>
+									</div>
+								</form>
+							</div>
+							<div class="row">
+								<div class="login-box">
+									No Tienes una Cuenta? <a href="/signup">Registrate</a>
+								</div>
+							</div>
+						</div>
+					</div>`;
 
-module.exports=yo`<div class="col s12 m7">
+module.exports=landing(signinForm);
+},{"../landing":21,"yo-yo":16}],24:[function(require,module,exports){
+var page  = require('page');
+var empty = require('empty-element');
+var template= require('./template');
+var title =require('title');
+page('/signup',function(ctx,next){
+	title('AppGol - Signup');
+	var main = document.getElementById('main-container');
+	empty(main).appendChild(template);
+//main.innerHTML='signup<a href="/">home</a>';
+
+})
+
+},{"./template":25,"empty-element":3,"page":11,"title":13}],25:[function(require,module,exports){
+var yo 	  = require('yo-yo');
+var landing =require('../landing');
+var signupForm=yo`<div class="col s12 m7">
 						<div class="signup-box">
 							<div class="row">
 								<h1 class="platzigram">App Gol</h1>
@@ -2853,7 +3121,9 @@ module.exports=yo`<div class="col s12 m7">
 									<h2>Rguistrate para ver las fotos de tus amigo estudiando</h2>
 									<div class="section">
 										<a class="btn btn-fb hide-on-small-only">Iniciar session con facebook</a>
-										<a class="btn btn-fb hide-on-med-and-up">Iniciar session</a>
+										<a class="btn btn-fb hide-on-med-and-up"> 
+										<i class="fab fa-facebook-square"></i>
+										Iniciar session</a>
 									</div>
 									<div class="divider"></div>
 									<div class="section">
@@ -2873,5 +3143,5 @@ module.exports=yo`<div class="col s12 m7">
 						</div>
 					</div>`;
 
-
-},{"yo-yo":13}]},{},[16]);
+module.exports=landing(signupForm);
+},{"../landing":21,"yo-yo":16}]},{},[20]);

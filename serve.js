@@ -16,11 +16,12 @@ app.use(express.static('public')); //indicamos a nuestro servidor que sirva el d
 
 //Gestionando la ruta
 app.get('/',function(req,res){
+
 	//res.send('Hola Mundo');
 	//console.log('un cliente se a unido');
 	//aqui lde decimos que renderise un archivo
 	//est index lo busca dentro de la carpeta view
-	res.render('index');
+	res.render('index',{title :'AppGol'});
 });
 
 app.get('/signup',function(req,res){
@@ -28,7 +29,7 @@ app.get('/signup',function(req,res){
 	//console.log('un cliente se a unido');
 	//aqui lde decimos que renderise un archivo
 	//est index lo busca dentro de la carpeta view
-	res.render('index');
+	res.render('index',{title :'AppGol - signup'});
 })
   
 
@@ -37,12 +38,12 @@ app.get('/signin',function(req,res){
 	//console.log('un cliente se a unido');
 	//aqui lde decimos que renderise un archivo
 	//est index lo busca dentro de la carpeta view
-	res.render('index');
+	res.render('index',{title :'AppGol - signin'});
 })
 
-app.listen(3000,function(error){
+app.listen(4000,function(error){
 	if (error ) return console.log('error perro'),process.exit(1);
-	console.log('escuchaod en el puero 3000');
+	console.log('escuchaod en el puero 4000');
 })
 
 

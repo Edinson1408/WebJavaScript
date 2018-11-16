@@ -1,6 +1,6 @@
 var yo 	  = require('yo-yo');
-
-module.exports=yo`<div class="col s12 m7">
+var landing =require('../landing');
+var signupForm=yo`<div class="col s12 m7">
 						<div class="signup-box">
 							<div class="row">
 								<h1 class="platzigram">App Gol</h1>
@@ -8,7 +8,9 @@ module.exports=yo`<div class="col s12 m7">
 									<h2>Rguistrate para ver las fotos de tus amigo estudiando</h2>
 									<div class="section">
 										<a class="btn btn-fb hide-on-small-only">Iniciar session con facebook</a>
-										<a class="btn btn-fb hide-on-med-and-up">Iniciar session</a>
+										<a class="btn btn-fb hide-on-med-and-up"> 
+										<i class="fab fa-facebook-square"></i>
+										Iniciar session</a>
 									</div>
 									<div class="divider"></div>
 									<div class="section">
@@ -28,3 +30,4 @@ module.exports=yo`<div class="col s12 m7">
 						</div>
 					</div>`;
 
+module.exports=landing(signupForm);
